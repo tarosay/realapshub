@@ -24,12 +24,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const slider = document.getElementById('lineWidthSlider') as HTMLInputElement;
     const valueLabel = document.getElementById('lineWidthValue') as HTMLLabelElement;
-    const chkEraser = document.getElementById("useEraser") as HTMLInputElement; 
+    const chkEraser = document.getElementById("useEraser") as HTMLInputElement;
+    const baseLuminanceInput = document.getElementById("baseLuminanceInput") as HTMLInputElement | null;
 
     const pResult = document.getElementById("result") as HTMLInputElement; 
     
     const lumimap = new LumimapLite(canvasContainer);
     lumimap.init();
+    if(baseLuminanceInput){
+        baseLuminanceInput.value = lumimap.lmcBaseLuminance.toString();
+    }
 
     let pfmData:PFMData;
     let luminanceFile:Blob;
@@ -135,6 +139,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     slider.addEventListener('input', updateLineWidth);
     chkEraser.addEventListener("change", updateEraseMode);
+    if(baseLuminanceInput){
+        const updateBaseLuminance = () => {
+            const value = Number(baseLuminanceInput.value);
+            if(Number.isFinite(value) && 0 < value){
+                void lumimap.setLmcBaseLuminance(value);
+            }
+            else{
+                baseLuminanceInput.value = lumimap.lmcBaseLuminance.toString();
+            }
+        };
+        baseLuminanceInput.addEventListener('change', updateBaseLuminance);
+        baseLuminanceInput.addEventListener('blur', updateBaseLuminance);
+    }
 
     async function fetchPFM(file:File) {
         const url = 'https://ik1-127-70116.vs.sakura.ne.jp/markAnomaly';
@@ -188,6 +205,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const file = fileInput.files![0];
         if(file){
             await lumimap.loadAsync(file);
+            if(baseLuminanceInput){
+                baseLuminanceInput.value = lumimap.lmcBaseLuminance.toString();
+            }
             //const pfmData = await fetchPFM(file );
             //const pfmData = PFMLoader.Load(new Uint8Array(await file.arrayBuffer()));
             //const data = createColorArray(pfmData, 0.00001, 10000);

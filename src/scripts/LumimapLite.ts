@@ -306,12 +306,30 @@ export class LumimapLite
     {
         const type:ImageTypes = "lmc";
         const bitmap = await BitmapUtil.createLMContrastImageBitmap(imageF, baseLuminance);
-        
+
         // 不要になったBitmapをDispose
         const old = this._imageDatas.get(type);
         if(old) old.close();
 
-        this._imageDatas.set(type, bitmap);        
+        this._imageDatas.set(type, bitmap);
+    }
+
+    get lmcBaseLuminance(){
+        return this._settings.lmc.baseLuminance;
+    }
+
+    async setLmcBaseLuminance(baseLuminance:number){
+        if(!Number.isFinite(baseLuminance) || baseLuminance <= 0) return;
+        this._settings.lmc.baseLuminance = baseLuminance;
+        if(this._lumiData){
+            await this.updateLmcImageBitmap(this._lumiData, this._settings.lmc.baseLuminance);
+            if(this._imageSelector.selectedImageType === "lmc"){
+                this.changeImage("lmc");
+            }
+            else{
+                this.updateAllMarkerTips();
+            }
+        }
     }
 
     private async updateCofImageBitmap(imageF:Image2d, pictBitmap:ImageBitmap)
