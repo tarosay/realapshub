@@ -155,15 +155,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const buttonConfigs: Array<{
             image: string;
             alt: string;
-            top: string;
+            top?: string;
+            bottom?: string;
             left?: string;
             right?: string;
         }> = [
             { image: './01.png', alt: 'Button 1', top: '12px', left: '12px' },
-            { image: './02.png', alt: 'Button 2', top: '84px', left: '12px' },
-            { image: './03.png', alt: 'Button 3', top: '144px', left: '12px' },
-            { image: './04.png', alt: 'Button 4', top: '204px', left: '12px' },
-            { image: './05.png', alt: 'Button 5', top: '264px', left: '12px' },
+            { image: './02.png', alt: 'Button 2', bottom: '192px', left: '12px' },
+            { image: './03.png', alt: 'Button 3', bottom: '132px', left: '12px' },
+            { image: './04.png', alt: 'Button 4', bottom: '72px', left: '12px' },
+            { image: './05.png', alt: 'Button 5', bottom: '12px', left: '12px' },
             { image: './06.png', alt: 'Button 6', top: '12px', right: '12px' }
         ];
 
@@ -177,7 +178,12 @@ document.addEventListener('DOMContentLoaded', function () {
             button.type = 'button';
             button.className = 'overlay-button';
             button.style.position = 'absolute';
-            button.style.top = config.top;
+            if (config.top) {
+                button.style.top = config.top;
+            }
+            if (config.bottom) {
+                button.style.bottom = config.bottom;
+            }
             if (config.left) {
                 button.style.left = config.left;
             }
