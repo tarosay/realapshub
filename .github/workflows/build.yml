@@ -1,0 +1,12 @@
+name: Build (manual only)
+
+on:
+  workflow_dispatch:
+    description: Manually run the production build when needed.
+
+jobs:
+  noop:
+    name: Build disabled
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "CI build on push has been disabled. Run the build locally when required."
