@@ -1,0 +1,101 @@
+@charset 'utf-8';
+
+.lumimaplite {
+    position:relative;
+    background-color: black;
+}
+
+.lumimaplite .imageselector 
+{
+    position:absolute;
+    top: 4px;
+    left: 4px;
+}
+
+.lumimaplite .lumimaplitecanvas 
+{
+    width: 100%;
+    height: 100%;
+    margin:0 auto;
+}
+.lumimaplitecanvas canvas {
+    position:absolute;
+    height:100%;
+    width:100%;
+}
+
+.lumimaplitecanvas .frontcanvas {
+    opacity: 0.5;
+    display: none;
+}
+
+.lumimaplitecanvas .markercontainer {
+    width: 100%;
+    height: 100%;
+}
+
+.lumimaplite .markercontainer .marker {
+    position: absolute;
+    box-shadow: 0 0 2px black;
+}
+
+.lumimaplite .marker .tips {
+    position:absolute;
+    top: -45px;
+    left: -50px;
+    width: 100px;
+    height: 24px;
+    font-size: 14px;
+    line-height: 24px;
+    background-color:white;
+    border-radius: 4px;
+    text-align: center;
+    
+    user-select: none;
+
+    color: black;
+    filter:drop-shadow(0px 1px 2px rgba(0,0,0,0.2));
+}
+
+.lumimaplite .marker .tips:after 
+{
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: -5px;
+    left: 0;
+    width: 0px;
+    height: 0px;
+    margin: auto;
+    border-style: solid;
+    border-color: white transparent transparent transparent;
+    border-width: 5px 5px 0 5px;
+}
+
+.lumimaplite .marker .finder {
+    position:absolute;
+    left: -6px;
+    top: -6px;
+
+    width: 12px;
+    height: 12px;
+    
+    border: white 1px solid;
+    box-sizing: border-box;
+    box-shadow: 0 0 0 1px greenyellow, 0 0 0 1px greenyellow inset;  /* 影を0,0位置にして縁っぽく */
+}
+
+.lumimaplite .scalebar 
+{
+    position:absolute;
+    bottom: 10px;
+    right: 10px;
+    padding:4px;
+    background-color:white;
+    border-radius: 4px;
+}
+
+.lumimaplite .scalebar canvas {
+    width:80px;
+    height:120px;
+}

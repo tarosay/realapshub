@@ -1,0 +1,14 @@
+// プロジェクトフォルダにnpmをインストール
+npm init -y
+
+// タイプスクリプトのビルドツールviteをインストール
+npm install -D vite typescript
+
+// コンパイラの初期化？？
+npx tsc --init
+
+// zip解凍用にfflateをインストール
+npm install fflate
+
+// package.jsonにBuildコマンドを追加
+"build": "vite build"

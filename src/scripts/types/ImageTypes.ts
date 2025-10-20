@@ -1,0 +1,1 @@
+export type ImageTypes = "picture" | "lm" | "lmc" | "cof";
