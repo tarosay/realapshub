@@ -12,48 +12,48 @@ import { LumimapLite } from './LumimapLite';
 // 4.PFMデータからImgを作成、MarkableCanvasをセットアップ
 
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const box = document.querySelector(".paintbox") as HTMLDivElement;
     const canvasContainer = document.querySelector(".lumimaplite") as HTMLDivElement;
-    
+
     const fileInput = document.querySelector("#fileinput") as HTMLInputElement;
 
     //const paintableCanvas = new MaskCanvas(canvasContainer);
     //const canvasRect = canvas.getBoundingClientRect();
     //paintableCanvas.setCanvasSize(canvasRect.width, canvasRect.height);
 
-    const slider = document.getElementById('lineWidthSlider') as HTMLInputElement;
-    const valueLabel = document.getElementById('lineWidthValue') as HTMLLabelElement;
-    const chkEraser = document.getElementById("useEraser") as HTMLInputElement;
+    // const slider = document.getElementById('lineWidthSlider') as HTMLInputElement;
+    // const valueLabel = document.getElementById('lineWidthValue') as HTMLLabelElement;
+    // const chkEraser = document.getElementById("useEraser") as HTMLInputElement;
     const baseLuminanceInput = document.getElementById("baseLuminanceInput") as HTMLInputElement | null;
 
-    const pResult = document.getElementById("result") as HTMLInputElement; 
-    
+    // const pResult = document.getElementById("result") as HTMLInputElement; 
+
     const lumimap = new LumimapLite(canvasContainer);
     lumimap.init();
-    if(baseLuminanceInput){
+    if (baseLuminanceInput) {
         baseLuminanceInput.value = lumimap.lmcBaseLuminance.toString();
     }
 
-    let pfmData:PFMData;
-    let luminanceFile:Blob;
-    let luminanceFileURL:string = "";
+    let pfmData: PFMData;
+    let luminanceFile: Blob;
+    let luminanceFileURL: string = "";
 
-    function updateLineWidth()
-    {
-        const value = slider.value;
-        //paintableCanvas.setLineWidth(Number(value));
-        valueLabel.innerHTML = value;
-    }
+    // function updateLineWidth()
+    // {
+    //     const value = slider.value;
+    //     //paintableCanvas.setLineWidth(Number(value));
+    //     valueLabel.innerHTML = value;
+    // }
 
-    function updateEraseMode()
-    {
+    function updateEraseMode() {
         //paintableCanvas.setEraserMode(chkEraser.checked);
     }
 
-    function savePFM(arrayBuffer:ArrayBuffer, filename = "image.pfm") {
+    function savePFM(arrayBuffer: Uint8Array<ArrayBufferLike>, filename = "image.pfm") {
         // ArrayBuffer → Blob
-        const blob = new Blob([arrayBuffer], { type: "application/octet-stream" });
+        let data = new Uint8Array(arrayBuffer);
+        const blob = new Blob([data], { type: "application/octet-stream" });
 
         // ダウンロードリンクを生成
         const url = URL.createObjectURL(blob);
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
             URL.revokeObjectURL(url);
         }, 0);
     }
-    function saveJpeg(arrayBuffer:ArrayBuffer, filename = "image.jpg") {
+    function saveJpeg(arrayBuffer: ArrayBuffer, filename = "image.jpg") {
         // ArrayBuffer → Blob
         const blob = new Blob([arrayBuffer], { type: "image/jpeg" });
 
@@ -87,13 +87,12 @@ document.addEventListener('DOMContentLoaded', function() {
             URL.revokeObjectURL(url);
         }, 0);
     }
-    function createColorArray(pfmData:PFMData, minLimit:number, maxLimit:number)
-    {
-        function clamp(value:number, lower:number, upper:number){
+    function createColorArray(pfmData: PFMData, minLimit: number, maxLimit: number) {
+        function clamp(value: number, lower: number, upper: number) {
             return Math.max(lower, Math.min(upper, value));
         }
         const srcData = pfmData.grayscale!;
-        const colorData:Uint8ClampedArray = new Uint8ClampedArray(pfmData.width * pfmData.height * 4);
+        const colorData: Uint8ClampedArray = new Uint8ClampedArray(pfmData.width * pfmData.height * 4);
 
         const RED = [255, 0, 0, 255]; // overflow
         const VIOLET = [127, 0, 255, 255]; // underflow;
@@ -104,22 +103,20 @@ document.addEventListener('DOMContentLoaded', function() {
         let loggedMaxLimit = Math.log10(maxLimit);
         let logRange = loggedMaxLimit - loggedMinLimit;
 
-        for(let i=0;i<srcData.length;i++){
+        for (let i = 0; i < srcData.length; i++) {
             let value = srcData[i];
-            if(value === -FLOAT32_MAX)
-            {
+            if (value === -FLOAT32_MAX) {
                 rgba = TRANSPARENT;
             }
-            else if(value === FLOAT32_MAX)
-            {
+            else if (value === FLOAT32_MAX) {
                 rgba = TRANSPARENT;
             }
-            else{
+            else {
                 const clamped = clamp(value, minLimit, maxLimit);
-                if(value === 0.0) value = 0.000001;
-                const ratio = (Math.log10(clamped)-loggedMinLimit)/logRange;
+                if (value === 0.0) value = 0.000001;
+                const ratio = (Math.log10(clamped) - loggedMinLimit) / logRange;
                 const t = 1.0 - (ratio * 2.0);
-                
+
                 rgba = [
                     clamp(1.5 - Math.abs(2.0 * t + 1.0), 0.15, 0.85) * 255,
                     clamp(1.5 - Math.abs(2.0 * t), 0.15, 0.85) * 255,
@@ -128,24 +125,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 ]
             }
 
-            const index = i*4;
-            colorData[index+0] = Math.round(rgba[0]);
-            colorData[index+1] = Math.round(rgba[1]);
-            colorData[index+2] = Math.round(rgba[2]);
-            colorData[index+3] = rgba[3]; // alpha
+            const index = i * 4;
+            colorData[index + 0] = Math.round(rgba[0]);
+            colorData[index + 1] = Math.round(rgba[1]);
+            colorData[index + 2] = Math.round(rgba[2]);
+            colorData[index + 3] = rgba[3]; // alpha
         }
         return colorData;
     }
 
-    slider.addEventListener('input', updateLineWidth);
-    chkEraser.addEventListener("change", updateEraseMode);
-    if(baseLuminanceInput){
+    // slider.addEventListener('input', updateLineWidth);
+    // chkEraser.addEventListener("change", updateEraseMode);
+    if (baseLuminanceInput) {
         const updateBaseLuminance = () => {
             const value = Number(baseLuminanceInput.value);
-            if(Number.isFinite(value) && 0 < value){
+            if (Number.isFinite(value) && 0 < value) {
                 void lumimap.setLmcBaseLuminance(value);
             }
-            else{
+            else {
                 baseLuminanceInput.value = lumimap.lmcBaseLuminance.toString();
             }
         };
@@ -153,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
         baseLuminanceInput.addEventListener('blur', updateBaseLuminance);
     }
 
-    async function fetchPFM(file:File) {
+    async function fetchPFM(file: File) {
         const url = 'https://ik1-127-70116.vs.sakura.ne.jp/markAnomaly';
 
         const formData = new FormData();
@@ -164,48 +161,47 @@ document.addEventListener('DOMContentLoaded', function() {
             //body: JSON.stringify({ file1: file }),
             body: formData
         })
-        .then(res=>{
-            return res.arrayBuffer();
-        })
-        .then(buffer=>{
-            const zip = unzipSync(new Uint8Array(buffer));
-            console.log(Object.entries(zip));
-            for (const [name, data] of Object.entries(zip) as [string, Uint8Array][]) {
-                console.log(name);
-                if(name.includes(".pfm"))
-                {
-                    savePFM(data, name);
-                    return PFMLoader.Load(data);
+            .then(res => {
+                return res.arrayBuffer();
+            })
+            .then(buffer => {
+                const zip = unzipSync(new Uint8Array(buffer));
+                console.log(Object.entries(zip));
+                for (const [name, data] of Object.entries(zip) as [string, Uint8Array][]) {
+                    console.log(name);
+                    if (name.includes(".pfm")) {
+                        savePFM(data, name);
+                        return PFMLoader.Load(data);
+                    }
+                    //else if(name.includes(".jpg"))
+                    //{
+                    //console.log(name);
+                    //    saveJpeg(data, name);
+                    //}
+                    //else if(name.includes("_Luminance.jpg"))
+                    //{
+                    //    luminanceFile = new Blob([data], { type: 'image/jpeg' });
+                    //    if(luminanceFileURL !== "") URL.revokeObjectURL(luminanceFileURL);
+                    //    luminanceFileURL = URL.createObjectURL(luminanceFile);                
+                    //    backimage.src = luminanceFileURL;
+                    //}
+                    //console.log(name);
                 }
-                //else if(name.includes(".jpg"))
-                //{
-                //console.log(name);
-                //    saveJpeg(data, name);
-                //}
-                //else if(name.includes("_Luminance.jpg"))
-                //{
-                //    luminanceFile = new Blob([data], { type: 'image/jpeg' });
-                //    if(luminanceFileURL !== "") URL.revokeObjectURL(luminanceFileURL);
-                //    luminanceFileURL = URL.createObjectURL(luminanceFile);                
-                //    backimage.src = luminanceFileURL;
-                //}
-                //console.log(name);
-            }
-            throw new Error('PFM File Not Found');
-        })
-        .catch(e=>{
-            throw new Error('Failed to fetch file');
-        });
-        
-        
+                throw new Error('PFM File Not Found');
+            })
+            .catch(e => {
+                throw new Error('Failed to fetch file');
+            });
+
+
     }
 
-    fileInput.addEventListener("change", async ()=>{
+    fileInput.addEventListener("change", async () => {
         // 呼び出し例（実際のAPI URLに置き換えてください）
         const file = fileInput.files![0];
-        if(file){
+        if (file) {
             await lumimap.loadAsync(file);
-            if(baseLuminanceInput){
+            if (baseLuminanceInput) {
                 baseLuminanceInput.value = lumimap.lmcBaseLuminance.toString();
             }
             //const pfmData = await fetchPFM(file );
@@ -216,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     const calcButton = document.querySelector("#calc") as HTMLInputElement;
-    calcButton.addEventListener("click", ()=>{
+    calcButton.addEventListener("click", () => {
         /*
         if(pfmData === null) return;
         const mask = markupCanvas.getMask(pfmData.width, pfmData.height);
@@ -232,8 +228,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     const resetButton = document.querySelector("#reset") as HTMLInputElement;
-    resetButton.addEventListener("click", ()=>{
+    resetButton.addEventListener("click", () => {
         //paintableCanvas.clearCanvas();
     });
-    
- });
+
+});
