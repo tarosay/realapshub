@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const lumimap = new LumimapLite(canvasContainer);
     lumimap.init();
+    createOverlayButtons(canvasContainer);
     if (baseLuminanceInput) {
         baseLuminanceInput.value = lumimap.lmcBaseLuminance.toString();
     }
@@ -148,6 +149,66 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         baseLuminanceInput.addEventListener('change', updateBaseLuminance);
         baseLuminanceInput.addEventListener('blur', updateBaseLuminance);
+    }
+
+    function createOverlayButtons(container: HTMLDivElement) {
+        const buttonConfigs: Array<{
+            image: string;
+            alt: string;
+            top: string;
+            left?: string;
+            right?: string;
+        }> = [
+            { image: './01.png', alt: 'Button 1', top: '12px', left: '12px' },
+            { image: './02.png', alt: 'Button 2', top: '84px', left: '12px' },
+            { image: './03.png', alt: 'Button 3', top: '144px', left: '12px' },
+            { image: './04.png', alt: 'Button 4', top: '204px', left: '12px' },
+            { image: './05.png', alt: 'Button 5', top: '264px', left: '12px' },
+            { image: './06.png', alt: 'Button 6', top: '12px', right: '12px' }
+        ];
+
+        const existingButtons = container.querySelectorAll('.overlay-button');
+        if (existingButtons.length > 0) {
+            return;
+        }
+
+        for (const config of buttonConfigs) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'overlay-button';
+            button.style.position = 'absolute';
+            button.style.top = config.top;
+            if (config.left) {
+                button.style.left = config.left;
+            }
+            if (config.right) {
+                button.style.right = config.right;
+            }
+            button.style.width = '48px';
+            button.style.height = '48px';
+            button.style.padding = '0';
+            button.style.border = 'none';
+            button.style.background = 'transparent';
+            button.style.cursor = 'pointer';
+            button.style.zIndex = '20';
+
+            const img = document.createElement('img');
+            img.src = config.image;
+            img.alt = config.alt;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.display = 'block';
+            img.draggable = false;
+
+            button.appendChild(img);
+            container.appendChild(button);
+        }
+
+        const imageSelector = container.querySelector('.imageselector') as HTMLElement | null;
+        if (imageSelector) {
+            imageSelector.style.left = '72px';
+            imageSelector.style.top = '16px';
+        }
     }
 
     async function fetchPFM(file: File) {
